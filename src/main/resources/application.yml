@@ -1,2 +1,6 @@
 logging:
   path: logback-spring.xml
+
+server: 
+  connection-timeout:
+    60000

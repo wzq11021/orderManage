@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * @author Tarro
  *
  */
-public class Message implements Serializable{
+public class Message implements Serializable {
 
 	private static final long serialVersionUID = 746539674864690019L;
 	
