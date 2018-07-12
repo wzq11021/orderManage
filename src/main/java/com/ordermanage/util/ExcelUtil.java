@@ -17,7 +17,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-//Excel
+/**
+ * Excel工具类
+ * @author Tarro
+ *
+ */
 public class ExcelUtil {
 	private final static String excel2003=".xls";
 	private final static String excel2007=".xlsx";

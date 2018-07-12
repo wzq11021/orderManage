@@ -18,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.ordermanage.bean.Message;
+import com.ordermanage.bean.Order;
 import com.ordermanage.service.IDataResolveService;
 import com.ordermanage.util.ExcelUtil;
 import com.ordermanage.util.JsonUtil;
@@ -55,26 +55,26 @@ public class DataResolveServiceImpl implements IDataResolveService{
 		List<Map<String, String>> paramList = new ArrayList<>();
 		
 		for(int i=0; i<list.size(); i++){
-			/*Message message = list.get(i);
-			values[i][0] = String.valueOf(message.getNo());
-			values[i][1] = String.valueOf(message.getContractCode());
-			values[i][2] = String.valueOf(message.getGoodName());
-			values[i][3] = String.valueOf(message.getGoodBarCode());
-			values[i][4] = String.valueOf(message.getGoodCode());
-			values[i][5] = String.valueOf(message.getOrderType());
-			values[i][6] = String.valueOf(message.getGoodType());
-			values[i][7] = String.valueOf(message.getOrderShop());
-			values[i][8] = String.valueOf(message.getAddress());
-			values[i][9] = String.valueOf(message.getSellPrice());
-			values[i][10] = String.valueOf(message.getCount());
-			values[i][11] = String.valueOf(message.getSimpleCount());
-			values[i][12] = String.valueOf(message.getLittleCount());
-			values[i][13] = String.valueOf(message.getRealCount());
-			values[i][14] = String.valueOf(message.getUnit());
-			values[i][15] = String.valueOf(message.getStageCount());
-			values[i][16] = String.valueOf(message.getOrderState());
-			values[i][17] = String.valueOf(message.getEndTime());
-			values[i][18] = String.valueOf(message.getOperatorName());*/
+			/*Order Order = list.get(i);
+			values[i][0] = String.valueOf(Order.getNo());
+			values[i][1] = String.valueOf(Order.getContractCode());
+			values[i][2] = String.valueOf(Order.getGoodName());
+			values[i][3] = String.valueOf(Order.getGoodBarCode());
+			values[i][4] = String.valueOf(Order.getGoodCode());
+			values[i][5] = String.valueOf(Order.getOrderType());
+			values[i][6] = String.valueOf(Order.getGoodType());
+			values[i][7] = String.valueOf(Order.getOrderShop());
+			values[i][8] = String.valueOf(Order.getAddress());
+			values[i][9] = String.valueOf(Order.getSellPrice());
+			values[i][10] = String.valueOf(Order.getCount());
+			values[i][11] = String.valueOf(Order.getSimpleCount());
+			values[i][12] = String.valueOf(Order.getLittleCount());
+			values[i][13] = String.valueOf(Order.getRealCount());
+			values[i][14] = String.valueOf(Order.getUnit());
+			values[i][15] = String.valueOf(Order.getStageCount());
+			values[i][16] = String.valueOf(Order.getOrderState());
+			values[i][17] = String.valueOf(Order.getEndTime());
+			values[i][18] = String.valueOf(Order.getOperatorName());*/
 			Map<String,String> map = list.get(i);
 			if(map.get("序号") != null){
 				String no = String.valueOf(map.get("序号"));
