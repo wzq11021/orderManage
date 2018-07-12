@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -68,9 +69,17 @@ public class JsonUtil {
 	 * @throws JsonMappingException
 	 * @throws IOException
 	 */
+	@SuppressWarnings("unchecked")
 	public static <T> List<T> toList(String json, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException {
 		//return mapper.readValue(json, new TypeReference<List<T>>() {});
-		return mapper.readValue(json, mapper.getTypeFactory().constructParametricType(ArrayList.class, clazz));
+		try {
+			JavaType javaType = getCollectionType(ArrayList.class, clazz);
+			return (List<T>) mapper.readValue(json, javaType);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+		//return mapper.readValue(json, mapper.getTypeFactory().constructParametricType(ArrayList.class, clazz));
 	}
 	
 	/**
@@ -83,5 +92,9 @@ public class JsonUtil {
 	 */
 	public static <T> Map<String, T> toMap(String json, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException {
 		return mapper.readValue(json, mapper.getTypeFactory().constructParametricType(HashMap.class, String.class, clazz));
+	}
+	
+	private static JavaType getCollectionType(Class<?> collectionClass, Class<?>... elementClasses) {   
+	    return mapper.getTypeFactory().constructParametricType(collectionClass, elementClasses);   
 	}
 }
