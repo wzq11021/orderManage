@@ -176,8 +176,8 @@ public class OrderServiceImpl extends CommonServiceImpl implements IOrderService
 				values[i][17] = endTime;
 				order.setEndTime(format.parse(endTime));
 			}
-			if(map.get("创建时间") != null){
-				String createTime = String.valueOf(map.get("创建时间"));
+			if(map.get("日期") != null){
+				String createTime = String.valueOf(map.get("日期"));
 				values[i][18] = createTime;
 				order.setCreateTime(format.parse(createTime));
 			}
@@ -294,8 +294,8 @@ public class OrderServiceImpl extends CommonServiceImpl implements IOrderService
 				
 				order.setEndTime(format.parse(endTime));
 			}
-			if(map.get("创建时间") != null){
-				String createTime = String.valueOf(map.get("创建时间"));
+			if(map.get("日期") != null){
+				String createTime = String.valueOf(map.get("日期"));
 				order.setCreateTime(format.parse(createTime));
 			}
 			if(map.get("审核人") != null){
