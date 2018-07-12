@@ -24,9 +24,13 @@ import com.ordermanage.service.IDataResolveService;
 import com.ordermanage.util.JsonUtil;
 import com.ordermanage.util.ResultUtil;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping("/dataResolve")
 @CrossOrigin
+@Api(value = "抓取订单数据")
 public class DataResolveController {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -42,6 +46,7 @@ public class DataResolveController {
 	 * @throws IOException
 	 */
 	@GetMapping("/resolveData")
+	@ApiOperation(value = "解析抓取到的数据", httpMethod = "GET")
 	public ResultUtil resolveData(HttpServletResponse response) throws JsonParseException, JsonMappingException, IOException{
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		logger.info("----------->>>>>>>>>resolveData start<<<<<<<<<-------------");
@@ -60,6 +65,7 @@ public class DataResolveController {
 	 * @param response
 	 */
 	@GetMapping("/exportDataExcel")
+	@ApiOperation(value = "导出抓取到的订单数据", httpMethod = "GET")
 	public void exportDataExcel(HttpServletRequest request, HttpServletResponse response){
 		logger.info("--------->>>>>>>>>exportDataExcel start<<<<<<<<<<-------------");
 		try{
