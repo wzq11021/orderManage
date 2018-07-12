@@ -2,6 +2,8 @@ package com.ordermanage.controller;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.ordermanage.service.IDataResolveService;
+import com.ordermanage.bean.Order;
+import com.ordermanage.constant.PageRecord;
+import com.ordermanage.service.IOrderService;
 import com.ordermanage.util.JsonUtil;
 import com.ordermanage.util.ResultUtil;
 
@@ -31,12 +35,12 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/dataResolve")
 @CrossOrigin
 @Api(value = "抓取订单数据")
-public class DataResolveController {
+public class OrderController {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
-	private IDataResolveService dataResolveService;
+	private IOrderService orderService;
 	
 	/**
 	 * 解析抓取的数据格式，转为json格式
@@ -44,19 +48,30 @@ public class DataResolveController {
 	 * @throws JsonParseException
 	 * @throws JsonMappingException
 	 * @throws IOException
+	 * @throws ParseException 
 	 */
 	@GetMapping("/resolveData")
 	@ApiOperation(value = "解析抓取到的数据", httpMethod = "GET")
-	public ResultUtil resolveData(HttpServletResponse response) throws JsonParseException, JsonMappingException, IOException{
+	public ResultUtil resolveData(HttpServletResponse response) throws JsonParseException, JsonMappingException, IOException, ParseException{
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		logger.info("----------->>>>>>>>>resolveData start<<<<<<<<<-------------");
-		List<Map<String,String>> list = dataResolveService.resolveData();
-		logger.info("----------->>>>>>>>>resolveData  end <<<<<<<<<-------------");
 		ResultUtil result = new ResultUtil();
+		List<Order> list = new ArrayList<>();
+		try{
+			list = orderService.resolveData();
+			
+		}catch (Exception e){
+			result.setCode(0);
+			result.setMsg("数据抓取失败");
+			result.setData(null);
+			logger.info("------------->>>>>>>>抓取数据失败，解析数据失败<<<<<<<-------------");
+			return result;
+		}
 		result.setCode(0);
 		result.setMsg("ok");
 		result.setCount(1000);
 		result.setData(list);
+		logger.info("----------->>>>>>>>>resolveData  end <<<<<<<<<-------------");	
 		return result;
 	}
 	/**
@@ -77,7 +92,7 @@ public class DataResolveController {
 			response.setContentType("application/vnd.ms-excel;charset=utf-8");
 			
 			//获取Excel表
-			HSSFWorkbook wb = dataResolveService.exportExcel();
+			HSSFWorkbook wb = orderService.exportExcel();
 			if(wb==null){
 				throw new Exception("抓取数据为空");
 			}
@@ -92,5 +107,21 @@ public class DataResolveController {
 			e.printStackTrace();
 		}
 		logger.info("--------->>>>>>>>>exportDataExcel end<<<<<<<<<<<<-------------");
+	}
+	/**
+	 * 查询抓取数据分页显示
+	 * @param queryDate
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 * @throws Exception 
+	 */
+	@GetMapping("queryOrderByCondition")
+	@ApiOperation(value = "分页查询抓取的数据", httpMethod = "GET")
+	public PageRecord<Order> queryOrderByCondition(String queryDate, String pageNum, String pageSize) throws Exception{
+		logger.info("---------->>>>>>>>>queryOrderByCondition start<<<<<<<<<-------------");
+		PageRecord<Order> page = orderService.queryOrderByCondition(queryDate, pageNum, pageSize);
+		logger.info("---------->>>>>>>>>queryOrderByCondition end<<<<<<<<<--------------");
+		return page;
 	}
 }

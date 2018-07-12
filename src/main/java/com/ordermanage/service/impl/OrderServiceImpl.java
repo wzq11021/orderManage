@@ -1,6 +1,8 @@
 package com.ordermanage.service.impl;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,13 +20,18 @@ import org.springframework.web.client.RestTemplate;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.google.common.collect.Maps;
 import com.ordermanage.bean.Order;
-import com.ordermanage.service.IDataResolveService;
+import com.ordermanage.constant.PageRecord;
+import com.ordermanage.constant.dbSql.InsertId;
+import com.ordermanage.constant.dbSql.QueryId;
+import com.ordermanage.constant.dbSql.UpdateId;
+import com.ordermanage.service.IOrderService;
 import com.ordermanage.util.ExcelUtil;
 import com.ordermanage.util.JsonUtil;
 
 @Service
-public class DataResolveServiceImpl implements IDataResolveService{
+public class OrderServiceImpl extends CommonServiceImpl implements IOrderService{
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -32,7 +39,7 @@ public class DataResolveServiceImpl implements IDataResolveService{
 	private RestTemplate restTemplate;
 
 	@Override
-	public HSSFWorkbook exportExcel() throws JsonParseException, JsonMappingException, IOException {
+	public HSSFWorkbook exportExcel() throws Exception {
 		logger.info("-------->>>>>>>>>>>exportExcel<<<<<<<<-------------");
 		
 		String data = restTemplate.getForObject("http://127.0.0.1:8000/jf/", String.class);
@@ -40,7 +47,7 @@ public class DataResolveServiceImpl implements IDataResolveService{
 		logger.info("---------->>>>>>>>data:"+data+"<<<<<<<---------------");
 		
 		if(!StringUtils.isNoneBlank(data)){
-			return null;
+			throw new Exception("抓取失败");
 		}
 		
 		//将json字符串转为List
@@ -48,11 +55,13 @@ public class DataResolveServiceImpl implements IDataResolveService{
 		
 		ExcelUtil excelUtil = new ExcelUtil();
 		//表头
-		String[] title={"序号", "合同号", "商品名称", "商品条码", "商品编码", "订单类型", "大类", "订货门店", "收货地", "销售价格", "件数", "零散数", "细数", "实收数", "单位", "场次", "订单状态", "有效截止时间", "审核人"};
+		String[] title={"序号", "合同号", "商品名称", "商品条码", "商品编码", "订单类型", "大类", "订货门店", "收货地", "销售价格", "件数", "零散数", "细数", "实收数", "单位", "场次", "订单状态", "有效截止时间", "创建时间", "审核人"};
 		//内容
 		String[][] values = new String[list.size()][title.length];
 		
-		List<Map<String, String>> paramList = new ArrayList<>();
+		List<Order> orderList = new ArrayList<>();
+		
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
 		for(int i=0; i<list.size(); i++){
 			/*Order Order = list.get(i);
@@ -76,88 +85,118 @@ public class DataResolveServiceImpl implements IDataResolveService{
 			values[i][17] = String.valueOf(Order.getEndTime());
 			values[i][18] = String.valueOf(Order.getOperatorName());*/
 			Map<String,String> map = list.get(i);
+			Order order = new Order();
 			if(map.get("序号") != null){
 				String no = String.valueOf(map.get("序号"));
 				values[i][0] = no;
+				order.setNo(no);
 			}
 			if(map.get("合同号") != null){
 				String contractCode = String.valueOf(map.get("合同号"));
 				values[i][1] = contractCode;
+				order.setContractCode(contractCode);
 			}
 			if(map.get("商品名称") != null){
 				String goodName = String.valueOf(map.get("商品名称"));
 				values[i][2] = goodName;
+				order.setGoodName(goodName);
 			}
 			if(map.get("商品条码") != null){
 				String goodBarCode = String.valueOf(map.get("商品条码"));
 				values[i][3] = goodBarCode;
+				order.setGoodBarCode(goodBarCode);
 			}
 			if(map.get("商品编码") != null){
 				String goodCode = String.valueOf(map.get("商品编码"));
 				values[i][4] = goodCode;
+				order.setGoodCode(goodCode);
 			}
 			if(map.get("订单类型") != null){
 				String orderType = String.valueOf(map.get("订单类型"));
 				values[i][5] = orderType;
+				order.setOrderType(orderType);
 			}
 			if(map.get("大类") != null){
 				String goodType = String.valueOf(map.get("大类"));
 				values[i][6] = goodType;
+				order.setGoodType(goodType);
 			}
 			if(map.get("订货门店") != null){
 				String orderShop = String.valueOf(map.get("订货门店"));
 				values[i][7] = orderShop;
+				order.setOrderShop(orderShop);
 			}
 			if(map.get("收货地") != null){
 				String address = String.valueOf(map.get("收货地"));
 				values[i][8] = address;
+				order.setAddress(address);
 			}
 			if(map.get("销售价格") != null){
 				String sellPrice = String.valueOf(map.get("销售价格"));
 				values[i][9] = sellPrice;
+				order.setSellPrice(new BigDecimal(sellPrice));
 			}
 			if(map.get("件数") != null){
 				String count = String.valueOf(map.get("件数"));
 				values[i][10] = count;
+				order.setCount(Integer.valueOf(count));
 			}
 			if(map.get("零散数") != null){
 				String simpleCount = String.valueOf(map.get("零散数"));
 				values[i][11] = simpleCount;
+				order.setSimpleCount(Integer.valueOf(simpleCount));
 			}
 			if(map.get("细数") != null){
 				String littleCount = String.valueOf(map.get("细数"));
 				values[i][12] = littleCount;
+				order.setLittleCount(Integer.valueOf(littleCount));
 			}
 			if(map.get("实收数") != null){
 				String realCount = String.valueOf(map.get("实收数"));
 				values[i][13] = realCount;
+				order.setRealCount(Integer.valueOf(realCount));
 			}
 			if(map.get("单位") != null){
 				String unit = String.valueOf(map.get("单位"));
 				values[i][14] = unit;
+				order.setUnit(unit);
 			}
 			if(map.get("场次") != null){
 				String stageCount = String.valueOf(map.get("场次"));
 				values[i][15] = stageCount;
+				order.setStageCount(stageCount);
 			}
 			if(map.get("订单状态") != null){
 				String orderState = String.valueOf(map.get("订单状态"));
 				values[i][16] = orderState;
+				order.setOrderState(orderState);
 			}
 			if(map.get("有效截止日期") != null){
 				String endTime = String.valueOf(map.get("有效截止日期"));
 				values[i][17] = endTime;
+				order.setEndTime(format.parse(endTime));
+			}
+			if(map.get("创建时间") != null){
+				String createTime = String.valueOf(map.get("创建时间"));
+				values[i][18] = createTime;
+				order.setCreateTime(format.parse(createTime));
 			}
 			if(map.get("审核人") != null){
 				String operatorName = String.valueOf(map.get("审核人"));
-				values[i][18] = operatorName;
+				values[i][19] = operatorName;
+				order.setOperatorName(operatorName);
+			}
+			if(queryObjectByParameter(QueryId.QUERY_ORDER_BY_ID, order) == null){
+				insert(InsertId.INSERT_NEW_ORDER_MESSAGE, order);
+			}else{
+				update(UpdateId.UPDATE_ORDER_MESSAGE, order);
 			}
 		}
 		return excelUtil.getExcel("订单信息", title, values);
 	}
 
 	@Override
-	public List<Map<String, String>> resolveData() throws JsonParseException, JsonMappingException, IOException {
+	public List<Order> resolveData() throws Exception {
 		logger.info("-------->>>>>>>>>>>resolveData<<<<<<<<-------------");
 		
 		String data = restTemplate.getForObject("http://127.0.0.1:8000/jf/", String.class);
@@ -165,98 +204,122 @@ public class DataResolveServiceImpl implements IDataResolveService{
 		logger.info("---------->>>>>>>>data:"+data+"<<<<<<<---------------");
 		
 		if(!StringUtils.isNoneBlank(data)){
-			return null;
+			throw new Exception("抓取数据失败");
 		}
 		
 		//将json字符串转为List
-		//List<Map> list = JSONObject.parseArray(data, Map.class);
 		List<Map> list = JsonUtil.toList(data, Map.class);
 		
 		logger.info("------->>>data: " + JsonUtil.toJson(list));
 		
-		List<Map<String, String>> paramList = new ArrayList<>();
-		
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		List<Order> orderList = new ArrayList<>();
 		for(int i=0; i<list.size(); i++){
 			Map<String,String> map = list.get(i);
-			Map<String,String> param = new HashMap<>();
+			Order order = new Order();
+			if(map.get("订单编号") != null){
+				String orderId = String.valueOf(map.get("订单编号"));
+				order.setOrderId(orderId);
+			}
 			if(map.get("序号") != null){
 				String no = String.valueOf(map.get("序号"));
-				param.put("no", no);
+				order.setNo(no);
 			}
 			if(map.get("合同号") != null){
 				String contractCode = String.valueOf(map.get("合同号"));
-				param.put("contractCode", contractCode);
+				order.setContractCode(contractCode);
 			}
 			if(map.get("商品名称") != null){
 				String goodName = String.valueOf(map.get("商品名称"));
-				param.put("goodName", goodName);
+				order.setGoodName(goodName);
 			}
 			if(map.get("商品条码") != null){
 				String goodBarCode = String.valueOf(map.get("商品条码"));
-				param.put("goodBarCode", goodBarCode);
+				order.setGoodBarCode(goodBarCode);
 			}
 			if(map.get("商品编码") != null){
 				String goodCode = String.valueOf(map.get("商品编码"));
-				param.put("goodCode", goodCode);
+				order.setGoodCode(goodCode);
 			}
 			if(map.get("订单类型") != null){
 				String orderType = String.valueOf(map.get("订单类型"));
-				param.put("orderType", orderType);
+				order.setOrderType(orderType);
 			}
 			if(map.get("大类") != null){
 				String goodType = String.valueOf(map.get("大类"));
-				param.put("goodType", goodType);
+				order.setGoodType(goodType);
 			}
 			if(map.get("订货门店") != null){
 				String orderShop = String.valueOf(map.get("订货门店"));
-				param.put("orderShop", orderShop);
+				order.setOrderShop(orderShop);
 			}
 			if(map.get("收货地") != null){
 				String address = String.valueOf(map.get("收货地"));
-				param.put("address", address);
+				order.setAddress(address);
 			}
 			if(map.get("销售价格") != null){
 				String sellPrice = String.valueOf(map.get("销售价格"));
-				param.put("sellPrice", sellPrice);
+				order.setSellPrice(new BigDecimal(sellPrice));
 			}
 			if(map.get("件数") != null){
 				String count = String.valueOf(map.get("件数"));
-				param.put("count", count);
+				order.setCount(Integer.valueOf(count));
 			}
 			if(map.get("零散数") != null){
 				String simpleCount = String.valueOf(map.get("零散数"));
-				param.put("simpleCount", simpleCount);
+				order.setSimpleCount(Integer.valueOf(simpleCount));
 			}
 			if(map.get("细数") != null){
 				String littleCount = String.valueOf(map.get("细数"));
-				param.put("littleCount", littleCount);
+				order.setLittleCount(Integer.valueOf(littleCount));
 			}
 			if(map.get("实收数") != null){
 				String realCount = String.valueOf(map.get("实收数"));
-				param.put("realCount", realCount);
+				order.setRealCount(Integer.valueOf(realCount));
 			}
 			if(map.get("单位") != null){
 				String unit = String.valueOf(map.get("单位"));
-				param.put("unit", unit);
+				order.setUnit(unit);
 			}
 			if(map.get("场次") != null){
 				String stageCount = String.valueOf(map.get("场次"));
-				param.put("stageCount", stageCount);
+				order.setStageCount(stageCount);
 			}
 			if(map.get("订单状态") != null){
 				String orderState = String.valueOf(map.get("订单状态"));
-				param.put("orderState", orderState);
+				order.setOrderState(orderState);
 			}
 			if(map.get("有效截止日期") != null){
 				String endTime = String.valueOf(map.get("有效截止日期"));
-				param.put("endTime", endTime);
+				
+				order.setEndTime(format.parse(endTime));
+			}
+			if(map.get("创建时间") != null){
+				String createTime = String.valueOf(map.get("创建时间"));
+				order.setCreateTime(format.parse(createTime));
 			}
 			if(map.get("审核人") != null){
 				String operatorName = String.valueOf(map.get("审核人"));
-				param.put("operatorName", operatorName);
+				order.setOperatorName(operatorName);
 			}
-			paramList.add(param);
+			orderList.add(order);
+			
+			//查询为空
+			if(queryObjectByParameter(QueryId.QUERY_ORDER_BY_ID, order)==null){
+				insert(InsertId.INSERT_NEW_ORDER_MESSAGE, order);
+			}else{
+				update(UpdateId.UPDATE_ORDER_MESSAGE, order);
+			}
+			
 		}
-		return paramList;
+		return orderList;
+	}
+	
+	@Override
+	public PageRecord<Order> queryOrderByCondition(String queryDate, String pageNum, String pageSize) throws Exception {
+		Map<String, Object> map = Maps.newHashMap();
+		map.put("queryDate", queryDate);
+		PageRecord<Order> page = queryPageByObject(QueryId.QUERY_COUNT_ORDER_BY_CONDITION, QueryId.QUERY_ORDER_BY_CONDITION, map, pageNum, pageSize);
+		return page;
 	}
 }

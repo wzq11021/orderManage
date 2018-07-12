@@ -1,18 +1,7 @@
 package com.ordermanage.bean;
 
-import java.io.Serializable;
-/**
- * 供应链信息
- * @author Tarro
- *
- */
-public class Supply implements Serializable{
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -3195936614487968513L;
-
-	private Integer id;
+public class Supply {
+    private Integer id;
 
     private String region;
 

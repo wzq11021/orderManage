@@ -1,42 +1,54 @@
 package com.ordermanage.bean;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-/**
- * 订单信息
- * @author Tarro
- *
- */
-public class Order implements Serializable{
+public class Order {
+    private Integer id;
 
-	private static final long serialVersionUID = 746539674864690019L;
-	
-	private Integer id;
-	private Integer no;//序号
-	private String contractCode;//合同号
-	private String goodName;//商品名称
-	private String goodBarCode;//商品条码
-	private String goodCode;//商品编码
-	private String orderType;//订单类型
-	private String goodType;//大类
-	private String orderShop;//订货门店
-	private String address;//收货地
-	private BigDecimal sellPrice;//销售价格
-	private Integer count;//件数
-	private Integer simpleCount;//零散数
-	private Integer littleCount;//细数
-	private Integer realCount;//实收数
-	private String unit;//单位
-	private String stageCount;//场次
-	private String orderState;//订单状态
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	private Date endTime;//有效截止时间
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	private Date createTime;//有效截止时间
-	private String operatorName;//审核人
+    private String orderId;
+
+    private String no;
+
+    private String contractCode;
+
+    private String goodName;
+
+    private String goodBarCode;
+
+    private String goodCode;
+
+    private String orderType;
+
+    private String goodType;
+
+    private String orderShop;
+
+    private String address;
+
+    private BigDecimal sellPrice;
+
+    private Integer count;
+
+    private Integer simpleCount;
+
+    private Integer littleCount;
+
+    private Integer realCount;
+
+    private String unit;
+
+    private String stageCount;
+
+    private String orderState;
+
+    private Date endTime;
+
+    private Date createTime;
+
+    private String operatorName;
+
+    private String companyCode;
 
     public Integer getId() {
         return id;
@@ -46,12 +58,20 @@ public class Order implements Serializable{
         this.id = id;
     }
 
-    public Integer getNo() {
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId == null ? null : orderId.trim();
+    }
+
+    public String getNo() {
         return no;
     }
 
-    public void setNo(Integer no) {
-        this.no = no;
+    public void setNo(String no) {
+        this.no = no == null ? null : no.trim();
     }
 
     public String getContractCode() {
@@ -202,7 +222,15 @@ public class Order implements Serializable{
         return operatorName;
     }
 
-    public void setOperatorname(String operatorName) {
+    public void setOperatorName(String operatorName) {
         this.operatorName = operatorName == null ? null : operatorName.trim();
+    }
+
+    public String getCompanyCode() {
+        return companyCode;
+    }
+
+    public void setCompanyCode(String companyCode) {
+        this.companyCode = companyCode == null ? null : companyCode.trim();
     }
 }

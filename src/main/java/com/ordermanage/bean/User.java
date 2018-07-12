@@ -1,19 +1,7 @@
 package com.ordermanage.bean;
 
-import java.io.Serializable;
-
-/**
- * 用户信息
- * @author Tarro
- *
- */
-public class User implements Serializable{
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -788825623226968329L;
-
-	private Integer id;
+public class User {
+    private Integer id;
 
     private String userName;
 
